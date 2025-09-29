@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sega Genesis Mini</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
 </head>
 <body>
     <header>
@@ -13,7 +14,18 @@
         <img src="assets/sorticon.png" alt="Sort Icon" class="sort-icon">
     </header>
     <main>
-        <span class="message">Coming soon, be patient!</span>
+        <div class="library">
+            <div class="grid-wrapper">
+                <button class="nav-button nav-up" aria-label="Show previous games" aria-hidden="true" tabindex="-1">
+                    <img src="assets/arrowup.png" alt="Previous">
+                </button>
+                <section class="game-grid" aria-label="Game library"></section>
+                <div class="selector" aria-hidden="true"></div>
+                <button class="nav-button nav-down" aria-label="Show next games" aria-hidden="true" tabindex="-1">
+                    <img src="assets/arrowdown.png" alt="Next">
+                </button>
+            </div>
+        </div>
     </main>
     <footer>
         <p>GAME_TITLE_HERE</p>
