@@ -1,0 +1,101 @@
+@font-face {
+    font-family: 'SEGA';
+    src: url('assets/sega.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+body {
+    margin: 0;
+    font-family: 'SEGA', system-ui, sans-serif;
+    text-decoration: black;
+    line-height: 1.5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #0f0f0f;
+    background-image: url('assets/minibackground.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    color: #f5f5f5;
+    text-align: center;
+}
+main {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.message {
+    display: inline-block;
+}
+header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 1rem 2rem 3rem;
+}
+
+.logo {
+    display: block;
+    width: 32%;
+    height: auto;
+    margin-top: 0;
+}
+
+.settings-icon,
+.sort-icon {
+    width: 22%;
+    height: auto;
+    position: absolute;
+    top: 1.5rem;
+    cursor: pointer;
+}
+
+.settings-icon {
+    left: 1.5rem;
+}
+
+.sort-icon {
+    right: 1.5rem;
+}
+
+
+footer {
+    position: relative;
+    margin-top: auto;
+    padding: 1.5rem 1rem calc(min(100vw, 1700px) * 0.09412 + 1.5rem);
+    min-height: calc(min(100vw, 1700px) * 0.09412);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-image: url('assets/titlebar.png');
+    background-repeat: no-repeat;
+    background-position: center bottom;
+    background-size: min(100%, 1700px) auto;
+}
+p,
+.message {
+    --outline: clamp(0.5px, 0.12vw, 1.6px);
+    max-width: 42rem;
+    margin: 0 auto;
+    font-size: clamp(0.9rem, 2.4vw, 2.2rem);
+    -webkit-text-stroke: var(--outline) #000;
+    text-shadow:
+        0 0 calc(var(--outline) * 2) #000,
+        calc(-1 * var(--outline)) calc(-1 * var(--outline)) 0 #000,
+        calc(var(--outline)) calc(-1 * var(--outline)) 0 #000,
+        calc(-1 * var(--outline)) calc(var(--outline)) 0 #000,
+        calc(var(--outline)) calc(var(--outline)) 0 #000;
+}
+
+footer p {
+    position: absolute;
+    bottom: calc(min(100vw, 1700px) * 0.04706);
+    left: 50%;
+    transform: translate(-50%, 50%);
+}
