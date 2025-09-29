@@ -15,11 +15,24 @@
       align-items: center;
       justify-content: center;
     }
+    #game {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .loading {
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.8);
+    }
   </style>
 </head>
 <body>
   <div style="width:640px;height:480px;max-width:100%">
-    <div id="game"></div>
+    <div id="game" aria-live="polite"></div>
   </div>
 
   <script>
@@ -38,7 +51,40 @@
       window.EJS_player = '#game';
       window.EJS_core = 'segaMD';
       window.EJS_gameUrl = romUrl;
+      window.EJS_onGameStart = () => {
+        document.getElementById('game').textContent = '';
+        resumeAudio();
+      };
+      window.EJS_onGameStart = () => resumeAudio();
     })();
+
+    function resumeAudio() {
+      const module = window.Module;
+      if (!module) return;
+      try {
+        module.resumeAudioContext?.();
+        const ctx = module.SDL2 && module.SDL2.audioContext;
+        if (ctx && ctx.state === 'suspended') {
+          ctx.resume();
+        }
+      } catch (err) {
+        console.warn('Audio resume failed', err);
+      }
+    }
+
+    function setupAudioUnlock() {
+      const unlock = () => {
+        resumeAudio();
+        document.removeEventListener('pointerdown', unlock);
+        document.removeEventListener('touchstart', unlock);
+        document.removeEventListener('keydown', unlock);
+      };
+      document.addEventListener('pointerdown', unlock, { passive: true });
+      document.addEventListener('touchstart', unlock, { passive: true });
+      document.addEventListener('keydown', unlock);
+    }
+
+    setupAudioUnlock();
   </script>
   <script src="https://www.emulatorjs.com/loader.js"></script>
 </body>

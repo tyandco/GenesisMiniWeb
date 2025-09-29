@@ -123,6 +123,25 @@
   backgroundMusic.volume = 0.45;
 
   let bgmStarted = false;
+  function resumeAudio() {
+    const audioCtx = backgroundMusic && backgroundMusic.context;
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {});
+    }
+    const module = window.Module;
+    if (module) {
+      try {
+        module.resumeAudioContext?.();
+        const ctx = module.SDL2 && module.SDL2.audioContext;
+        if (ctx && ctx.state === 'suspended') {
+          ctx.resume();
+        }
+      } catch (err) {
+        console.warn('Audio resume failed', err);
+      }
+    }
+  }
+
   function startBackgroundMusic() {
     if (bgmStarted) return;
     backgroundMusic.play()
@@ -136,8 +155,12 @@
 
   function setupBgmUnlock() {
     if (bgmStarted) return;
+    const unlock = () => {
+      resumeAudio();
+      startBackgroundMusic();
+    };
     ["pointerdown", "touchstart", "keydown"].forEach((eventName) => {
-      window.addEventListener(eventName, startBackgroundMusic, { once: true });
+      window.addEventListener(eventName, unlock, { once: true });
     });
   }
 
