@@ -66,6 +66,57 @@
     slide: "assets/entry.wav"
   };
 
+  const ROM_MAP = {
+    alexkiddintheenchantedcastle: "roms/us_us_Alex_Kidd.bin.zip",
+    alisiadragoon: "roms/us_us_Alisia_Dragoon.bin.zip",
+    alteredbeast: "roms/us_us_Altered_Beast.bin.zip",
+    beyondoasis: "roms/us_us_Beyond_Oasis.bin.zip",
+    castleofillusionstarringmickeymouse: "roms/us_us_Castle_of_Illusion.bin.zip",
+    castlevaniabloodlines: "roms/us_us_Castlevania_Bloodlines.bin.zip",
+    columns: "roms/us_us_Columns.bin.zip",
+    comixzone: "roms/us_us_Comix_Zone.bin.zip",
+    contrahardcorps: "roms/us_us_Contra_Hard_Corps.bin.zip",
+    darius: "roms/us_us_Darius.bin.zip",
+    drrobotniksmeanbeanmachine: "roms/us_us_Dr_Robotnik_s_Mean_Bean_Machine.bin.zip",
+    dynamiteheaddy: "roms/us_us_Dynamite_Headdy.bin.zip",
+    earthwormjim: "roms/us_us_Earthworm_Jim.bin.zip",
+    eccothedolphin: "roms/us_us_Ecco_the_Dolphin.bin.zip",
+    eternalchampions: "roms/us_us_Eternal_Champions.bin.zip",
+    ghoulsnghosts: "roms/us_us_Ghouls_n_Ghosts.bin.zip",
+    goldenaxe: "roms/us_us_Golden_Axe.bin.zip",
+    gunstarheroes: "roms/us_us_Gunstar_Heroes.bin.zip",
+    kidchameleon: "roms/us_us_Kid_Chameleon.bin.zip",
+    landstalker: "roms/us_us_Landstalker.bin.zip",
+    lightcrusader: "roms/us_us_Light_Crusader.bin.zip",
+    megamanthewilywars: "roms/us_us_Mega_Man.bin.zip",
+    monsterworldiv: "roms/us_us_Monster_World_IV.bin.zip",
+    mortalkombatii: "roms/us_us_Mortal_Kombat_II.bin.zip",
+    phantasystariv: "roms/us_us_Phantasy_Star_IV.bin.zip",
+    roadrashii: "roms/us_us_Road_Rash_II.bin.zip",
+    shiningforce: "roms/us_us_Shining_Force.bin.zip",
+    shinobiii: "roms/us_us_Shinobi_III.bin.zip",
+    sonicspinball: "roms/us_us_Sonic_Spinball.bin.zip",
+    sonicthehedgehog: "roms/us_us_Sonic_The_Hedgehog.bin.zip",
+    sonicthehedgehog2: "roms/us_us_Sonic_The_Hedgehog_2.bin.zip",
+    spaceharrierii: "roms/us_us_Space_Harrier_II.bin.zip",
+    streetfighteriispecialchampionedition: "roms/us_us_STREET_FIGHTER_II.bin.zip",
+    streetsofrage2: "roms/us_us_Streets_of_Rage_2.bin.zip",
+    strider: "roms/us_us_Strider.bin.zip",
+    superfantasyzone: "roms/us_us_Super_Fantasy_Zone.bin.zip",
+    swordofvermilion: "roms/us_us_Sword_of_Vermilion.BIN.zip",
+    tetris: "roms/us_us_Tetris.bin.zip",
+    thunderforceiii: "roms/us_us_Thunder_Force_III.bin.zip",
+    toejamearl: "roms/us_us_ToeJam_Earl.bin.zip",
+    vectorman: "roms/us_us_Vectorman.bin.zip",
+    virtuafighter2: "roms/us_us_Virtua_Fighter_2.bin.zip",
+    wonderboyinmonsterworld: "roms/us_us_Wonder_Boy_in_Monster_World.bin.zip",
+    worldofillusionstarringmickeymouseanddonaldduck: "roms/us_us_World_of_Illusion.bin.zip"
+  };
+
+  function sanitizeTitle(value) {
+    return value.toLowerCase().replace(/\(.*?\)/g, "").replace(/[^a-z0-9]/g, "");
+  }
+
   const backgroundMusic = new Audio("assets/bgmus.mp3");
   backgroundMusic.loop = true;
   backgroundMusic.preload = "auto";
@@ -107,11 +158,14 @@
     return files
       .map((file) => {
         if (manualTitles[file]) {
-          return { file, title: manualTitles[file] };
+          const manualTitle = manualTitles[file];
+          const key = sanitizeTitle(manualTitle);
+          return { file, title: manualTitle, rom: ROM_MAP[key] ?? null };
         }
         const withoutExt = file.replace(/\.[^.]+$/, "");
         const cleaned = withoutExt.replace(/\s*\(.*?\)/g, "").trim();
-        return { file, title: cleaned || withoutExt };
+        const key = sanitizeTitle(cleaned || withoutExt);
+        return { file, title: cleaned || withoutExt, rom: ROM_MAP[key] ?? null };
       })
       .sort((a, b) => a.title.localeCompare(b.title));
   }
@@ -223,6 +277,7 @@
         const tile = document.createElement("div");
         tile.className = "game-tile";
         tile.dataset.index = String(index);
+        tile.dataset.rom = game.rom ?? "";
         tile.tabIndex = 0;
         tile.setAttribute("role", "button");
         tile.setAttribute("aria-label", game.title);
@@ -238,7 +293,19 @@
 
         tile.addEventListener("mouseenter", () => setSelection(index, { viaHover: true }));
         tile.addEventListener("focus", () => setSelection(index));
-        tile.addEventListener("click", () => setSelection(index));
+        tile.addEventListener("click", () => {
+          const alreadySelected = selectionIndex === index;
+          setSelection(index);
+          if (alreadySelected) {
+            launchGame(game);
+          }
+        });
+        tile.addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            event.preventDefault();
+            launchGame(game);
+          }
+        });
       }
 
       while (gameGrid.children.length < PAGE_SIZE) {
@@ -360,7 +427,7 @@
           break;
         case "Enter":
           event.preventDefault();
-          playSound("slide", 0.4);
+          launchGame(games[selectionIndex]);
           break;
         case "End":
           event.preventDefault();
@@ -384,6 +451,22 @@
 
     // Attempt to start background music if autoplay is already permitted
     startBackgroundMusic();
+  }
+
+  function launchGame(game) {
+    if (!game) return;
+    if (!game.rom) {
+      playSound("nav", 0.15);
+      alert(`ROM for "${game.title}" is missing.`);
+      return;
+    }
+
+    playSound("slide", 0.4);
+
+    const url = new URL('play.html', window.location.href);
+    url.searchParams.set('title', game.title);
+    url.searchParams.set('rom', game.rom);
+    window.location.href = url.toString();
   }
 
   document.addEventListener("DOMContentLoaded", initializeLibrary);

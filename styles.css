@@ -164,6 +164,19 @@ main {
     pointer-events: none;
 }
 
+.game-tile[data-rom=""]::after {
+    content: "ROM MISSING";
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 0.25rem;
+    font-size: clamp(0.55rem, 1vw, 0.7rem);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    background: rgba(180, 33, 33, 0.85);
+    color: #fff;
+    text-align: center;
+}
+
 .game-tile > * {
     position: relative;
     z-index: 1;
@@ -282,5 +295,6 @@ footer p {
     transform: translate(-50%, 50%);
     white-space: nowrap;
     max-width: min(90vw, 1400px);
+    overflow: hidden;
     text-overflow: ellipsis;
 }
